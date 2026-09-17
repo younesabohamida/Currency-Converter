@@ -1,5 +1,5 @@
 // تسجيل خدمة العمل بدون إنترنت — يُمنع تسجيلها في المعاينة أو أثناء التطوير.
-const SW_URL = "/sw.js";
+const SW_URL = `${import.meta.env.BASE_URL}sw.js`;
 
 function isBlockedContext(): boolean {
   if (!import.meta.env.PROD) return true;
@@ -30,7 +30,7 @@ export function registerServiceWorker() {
     return;
   }
   window.addEventListener("load", () => {
-    void navigator.serviceWorker.register(SW_URL, { scope: "/" }).catch(() => {
+    void navigator.serviceWorker.register(SW_URL, { scope: import.meta.env.BASE_URL }).catch(() => {
       /* تجاهل الفشل — التطبيق يعمل بشكل طبيعي */
     });
   });
