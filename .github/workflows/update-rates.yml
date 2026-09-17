@@ -21,7 +21,6 @@ jobs:
           node --input-type=module <<'EOF'
           import fs from 'node:fs';
 
-          // خرائط رموز العملات في تطبيقنا إلى مسارات صفحاتها على sp-today.com
           const SLUGS = {
             usd: 'us-dollar',
             eur: 'euro',
@@ -37,7 +36,6 @@ jobs:
             chf: 'swiss_franc',
             rub: 'russian_ruble',
             iqd: 'iraqi_dinar',
-            // لا توجد صفحة لليرة اللبنانية على هذا الموقع، تبقى قيمتها كما هي
           };
 
           const file = JSON.parse(fs.readFileSync('public/rates.json', 'utf8'));
@@ -49,11 +47,13 @@ jobs:
             });
             if (!res.ok) return null;
             const html = await res.text();
-            const buyMatch = html.match(/شراء[\s\S]{0,80}?([\d]+(?:[.,]\d+)?)/);
-            const sellMatch = html.match(/بيع[\s\S]{0,80}?([\d]+(?:[.,]\d+)?)/);
+            // نشترط وجود فاصلة عشرية في الرقم (مثل 154.40) لتفادي التقاط
+            // أرقام عشوائية من أكواد التصميم (مثل text-2xl) التي غالباً أرقام صحيحة بلا فاصلة.
+            const buyMatch = html.match(/شراء[\s\S]{0,300}?(\d+\.\d{1,4})/);
+            const sellMatch = html.match(/بيع[\s\S]{0,300}?(\d+\.\d{1,4})/);
             if (!buyMatch || !sellMatch) return null;
-            const buy = Number(buyMatch[1].replace(',', ''));
-            const sell = Number(sellMatch[1].replace(',', ''));
+            const buy = Number(buyMatch[1]);
+            const sell = Number(sellMatch[1]);
             if (!(buy > 0) || !(sell > 0)) return null;
             return { buy, sell };
           }
@@ -70,7 +70,6 @@ jobs:
             } catch (e) {
               console.log(`ERROR ${id}: ${e.message}`);
             }
-            // مهلة صغيرة بين الطلبات حتى لا نُثقل على الموقع
             await new Promise((r) => setTimeout(r, 800));
           }
 
