@@ -37,7 +37,7 @@ export const DEFAULT_RATES_URL = `${import.meta.env.BASE_URL}rates.json`;
 export function defaultSettings(): Settings {
   return {
     version: 2,
-    lang: "ar",
+    lang: "en",
     dark: true,
     priceMode: "sell",
     targetCurrency: "eur",
