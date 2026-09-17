@@ -1,0 +1,244 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+@import "flag-icons/css/flag-icons.min.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --font-sans: "Cairo", ui-sans-serif, system-ui, sans-serif;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-loss: var(--loss);
+  --color-loss-soft: var(--loss-soft);
+  --color-hero: var(--hero);
+  --color-hero-foreground: var(--hero-foreground);
+  --color-surface-raised: var(--surface-raised);
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: oklch(0.985 0.003 240);
+  --foreground: oklch(0.2 0.025 240);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.02 240);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.02 240);
+  --primary: oklch(0.48 0.09 178);
+  --primary-foreground: oklch(0.985 0.01 180);
+  --secondary: oklch(0.965 0.006 225);
+  --secondary-foreground: oklch(0.32 0.025 230);
+  --muted: oklch(0.96 0.004 240);
+  --muted-foreground: oklch(0.5 0.018 235);
+  --accent: oklch(0.9 0.07 178);
+  --accent-foreground: oklch(0.28 0.05 180);
+  --destructive: oklch(0.55 0.2 27);
+  --destructive-foreground: oklch(0.985 0.01 90);
+  --border: oklch(0.89 0.012 225);
+  --input: oklch(0.85 0.018 225);
+  --ring: oklch(0.55 0.09 178);
+  --success: oklch(0.61 0.17 166);
+  --success-foreground: oklch(0.985 0.01 170);
+  --loss: oklch(0.61 0.22 22);
+  --loss-soft: oklch(0.95 0.045 20);
+  --hero: oklch(0.34 0.105 172);
+  --hero-foreground: oklch(0.985 0.01 170);
+  --surface-raised: oklch(0.97 0.006 230);
+  --flag-red: oklch(0.57 0.22 27);
+  --flag-green: oklch(0.49 0.16 154);
+  --flag-blue: oklch(0.44 0.2 258);
+  --flag-yellow: oklch(0.84 0.16 89);
+  --flag-white: oklch(0.99 0 0);
+  --flag-dark: oklch(0.2 0.02 240);
+  --hero-gradient: linear-gradient(135deg, oklch(0.31 0.095 174), oklch(0.42 0.13 166));
+  --hero-wave: color-mix(in oklch, var(--success) 28%, transparent);
+  --shadow-panel: 0 12px 30px -22px color-mix(in oklch, var(--foreground) 24%, transparent), 0 2px 8px -6px color-mix(in oklch, var(--foreground) 14%, transparent);
+  --shadow-control: 0 4px 12px -8px color-mix(in oklch, var(--foreground) 20%, transparent);
+  --chart-1: oklch(0.55 0.11 178);
+  --chart-2: oklch(0.65 0.12 90);
+  --chart-3: oklch(0.6 0.15 40);
+  --chart-4: oklch(0.55 0.1 250);
+  --chart-5: oklch(0.6 0.13 320);
+  --sidebar: oklch(0.97 0.01 90);
+  --sidebar-foreground: oklch(0.24 0.02 175);
+  --sidebar-primary: oklch(0.48 0.09 178);
+  --sidebar-primary-foreground: oklch(0.985 0.01 180);
+  --sidebar-accent: oklch(0.9 0.07 178);
+  --sidebar-accent-foreground: oklch(0.28 0.05 180);
+  --sidebar-border: oklch(0.9 0.015 170);
+  --sidebar-ring: oklch(0.55 0.09 178);
+}
+
+.dark {
+  --background: oklch(0.145 0.03 245);
+  --foreground: oklch(0.96 0.008 235);
+  --card: oklch(0.205 0.035 242);
+  --card-foreground: oklch(0.96 0.008 235);
+  --popover: oklch(0.205 0.035 242);
+  --popover-foreground: oklch(0.96 0.008 235);
+  --primary: oklch(0.71 0.15 166);
+  --primary-foreground: oklch(0.13 0.025 245);
+  --secondary: oklch(0.255 0.04 240);
+  --secondary-foreground: oklch(0.94 0.01 235);
+  --muted: oklch(0.235 0.032 242);
+  --muted-foreground: oklch(0.73 0.025 235);
+  --accent: oklch(0.29 0.045 235);
+  --accent-foreground: oklch(0.96 0.008 235);
+  --destructive: oklch(0.68 0.18 25);
+  --destructive-foreground: oklch(0.16 0.02 190);
+  --border: oklch(0.63 0.06 230 / 28%);
+  --input: oklch(0.62 0.055 230 / 38%);
+  --ring: oklch(0.71 0.15 166);
+  --success: oklch(0.75 0.19 165);
+  --success-foreground: oklch(0.14 0.03 190);
+  --loss: oklch(0.7 0.2 20);
+  --loss-soft: oklch(0.24 0.065 20);
+  --hero: oklch(0.245 0.055 238);
+  --hero-foreground: oklch(0.98 0.006 235);
+  --surface-raised: oklch(0.255 0.04 240);
+  --hero-gradient: linear-gradient(135deg, oklch(0.205 0.052 245), oklch(0.285 0.068 232));
+  --hero-wave: oklch(0.54 0.08 225 / 24%);
+  --shadow-panel: 0 18px 44px -22px oklch(0.025 0.03 250 / 82%);
+  --shadow-control: 0 5px 18px -9px oklch(0.025 0.03 250 / 78%);
+  --chart-1: oklch(0.65 0.12 178);
+  --chart-2: oklch(0.7 0.12 90);
+  --chart-3: oklch(0.68 0.15 40);
+  --chart-4: oklch(0.62 0.12 250);
+  --chart-5: oklch(0.66 0.14 320);
+  --sidebar: oklch(0.185 0.036 244);
+  --sidebar-foreground: oklch(0.96 0.008 235);
+  --sidebar-primary: oklch(0.62 0.11 178);
+  --sidebar-primary-foreground: oklch(0.16 0.02 190);
+  --sidebar-accent: oklch(0.27 0.045 238);
+  --sidebar-accent-foreground: oklch(0.96 0.008 235);
+  --sidebar-border: oklch(0.63 0.06 230 / 24%);
+  --sidebar-ring: oklch(0.71 0.15 166);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+    min-width: 320px;
+    letter-spacing: 0;
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+@utility shadow-panel {
+  box-shadow: var(--shadow-panel);
+}
+
+@utility shadow-control {
+  box-shadow: var(--shadow-control);
+}
+
+@utility hero-surface {
+  background: var(--hero-gradient);
+}
+
+@utility hero-waves {
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    border-radius: 9999px;
+    background: var(--hero-wave);
+    transform: rotate(-18deg);
+    pointer-events: none;
+  }
+  &::before {
+    width: 18rem;
+    height: 4.5rem;
+    right: -5rem;
+    bottom: -2.5rem;
+  }
+  &::after {
+    width: 13rem;
+    height: 3rem;
+    right: 2rem;
+    bottom: -2.2rem;
+    opacity: 0.55;
+  }
+}
+
+.flag-mark .fi { width: 100%; height: 100%; background-size: cover; }
+.flag-symbol { position: relative; z-index: 2; font-weight: 900; line-height: 1; }
+.flag-symbol-usdt { color: var(--success); }
+.flag-symbol-gold21 { color: var(--flag-yellow); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .status-dot-online {
+    animation: status-pulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes status-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--primary) 35%, transparent); }
+  50% { box-shadow: 0 0 0 5px transparent; }
+}
