@@ -32,7 +32,7 @@ export interface Settings {
   syncSource: SyncSource | null;
 }
 
-export const DEFAULT_RATES_URL = "/rates.json";
+export const DEFAULT_RATES_URL = `${import.meta.env.BASE_URL}rates.json`;
 
 export function defaultSettings(): Settings {
   return {
