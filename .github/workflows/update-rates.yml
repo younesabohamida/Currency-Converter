@@ -41,26 +41,32 @@ jobs:
           const file = JSON.parse(fs.readFileSync('public/rates.json', 'utf8'));
           const rates = file.rates || {};
 
-          async function fetchRate(slug) {
-            const res = await fetch(`https://sp-today.com/currency/${slug}`, {
+          async function fetchHtml(url) {
+            const res = await fetch(url, {
               headers: { 'User-Agent': 'Mozilla/5.0 (compatible; RatesBot/1.0)' },
             });
             if (!res.ok) return null;
-            const html = await res.text();
-            // نشترط وجود فاصلة عشرية في الرقم (مثل 154.40) لتفادي التقاط
-            // أرقام عشوائية من أكواد التصميم (مثل text-2xl) التي غالباً أرقام صحيحة بلا فاصلة.
-            const buyMatch = html.match(/شراء[\s\S]{0,300}?(\d+\.\d{1,4})/);
-            const sellMatch = html.match(/بيع[\s\S]{0,300}?(\d+\.\d{1,4})/);
+            return res.text();
+          }
+
+          function extractBuySell(html) {
+            if (!html) return null;
+            // يسمح بفاصلة الآلاف (مثل 16,648.00) ويشترط وجود فاصلة عشرية
+            // لتفادي التقاط أرقام عشوائية من أكواد التصميم.
+            const buyMatch = html.match(/شراء[\s\S]{0,300}?([\d,]+\.\d{1,4})/);
+            const sellMatch = html.match(/بيع[\s\S]{0,300}?([\d,]+\.\d{1,4})/);
             if (!buyMatch || !sellMatch) return null;
-            const buy = Number(buyMatch[1]);
-            const sell = Number(sellMatch[1]);
+            const buy = Number(buyMatch[1].replace(/,/g, ''));
+            const sell = Number(sellMatch[1].replace(/,/g, ''));
             if (!(buy > 0) || !(sell > 0)) return null;
             return { buy, sell };
           }
 
+          // العملات
           for (const [id, slug] of Object.entries(SLUGS)) {
             try {
-              const entry = await fetchRate(slug);
+              const html = await fetchHtml(`https://sp-today.com/currency/${slug}`);
+              const entry = extractBuySell(html);
               if (entry) {
                 rates[id] = entry;
                 console.log(`OK ${id}: buy=${entry.buy} sell=${entry.sell}`);
@@ -71,6 +77,20 @@ jobs:
               console.log(`ERROR ${id}: ${e.message}`);
             }
             await new Promise((r) => setTimeout(r, 800));
+          }
+
+          // الذهب عيار 21 (بالليرة السورية الجديدة)
+          try {
+            const html = await fetchHtml('https://sp-today.com/gold/21k/syp');
+            const entry = extractBuySell(html);
+            if (entry) {
+              rates.gold21 = entry;
+              console.log(`OK gold21: buy=${entry.buy} sell=${entry.sell}`);
+            } else {
+              console.log('SKIP gold21: تعذّر قراءة السعر، سيبقى القديم');
+            }
+          } catch (e) {
+            console.log(`ERROR gold21: ${e.message}`);
           }
 
           if (rates.usd) rates.usdt = { ...rates.usd };
