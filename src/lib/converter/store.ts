@@ -38,9 +38,9 @@ export function defaultSettings(): Settings {
   return {
     version: 2,
     lang: "ar",
-    dark: false,
+    dark: true,
     priceMode: "sell",
-    targetCurrency: "syp",
+    targetCurrency: "eur",
     rates: { ...DEFAULT_RATES },
     custom: [],
     enabled: [...DEFAULT_ENABLED],
