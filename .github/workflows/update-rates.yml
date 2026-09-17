@@ -1,7 +1,7 @@
 name: Update rates.json
 
-# يحدّث ملف public/rates.json تلقائياً كل ساعة مجاناً عبر GitHub Actions.
-# سعر الدولار مقابل الليرة الجديدة يُضبط من متغير المستودع USD_SYP_NEW (Settings → Variables).
+# يحدّث ملف public/rates.json تلقائياً كل ساعة مجاناً عبر GitHub Actions،
+# بجلب الأسعار مباشرة من موقع "الليرة اليوم" (sp-today.com).
 on:
   schedule:
     - cron: "0 * * * *"
@@ -17,27 +17,65 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build rates.json
-        env:
-          USD_SYP_NEW: ${{ vars.USD_SYP_NEW }}
-          SPREAD: ${{ vars.SPREAD }}
         run: |
           node --input-type=module <<'EOF'
           import fs from 'node:fs';
-          const anchor = Number(process.env.USD_SYP_NEW || 115);
-          const spread = Number(process.env.SPREAD || 0.01);
-          const codes = { usd:'USD', eur:'EUR', sar:'SAR', aed:'AED', try:'TRY', egp:'EGP', mad:'MAD',
-                          kwd:'KWD', qar:'QAR', jod:'JOD', gbp:'GBP', chf:'CHF', rub:'RUB', iqd:'IQD', lbp:'LBP' };
-          const res = await fetch('https://open.er-api.com/v6/latest/USD');
-          const data = await res.json();
+
+          // خرائط رموز العملات في تطبيقنا إلى مسارات صفحاتها على sp-today.com
+          const SLUGS = {
+            usd: 'us-dollar',
+            eur: 'euro',
+            sar: 'saudi_riyal',
+            aed: 'emirati_dirham',
+            try: 'turkish_lira',
+            egp: 'egyptian_pound',
+            mad: 'moroccan_dirham',
+            kwd: 'kuwaiti_dinar',
+            qar: 'qatari_riyal',
+            jod: 'jordanian_dinar',
+            gbp: 'british_pound',
+            chf: 'swiss_franc',
+            rub: 'russian_ruble',
+            iqd: 'iraqi_dinar',
+            // لا توجد صفحة لليرة اللبنانية على هذا الموقع، تبقى قيمتها كما هي
+          };
+
           const file = JSON.parse(fs.readFileSync('public/rates.json', 'utf8'));
           const rates = file.rates || {};
-          const put = (id, mid) => { rates[id] = { buy: +(mid*(1-spread)).toFixed(6), sell: +(mid*(1+spread)).toFixed(6) }; };
-          put('usd', anchor);
-          put('usdt', anchor);
-          for (const [id, code] of Object.entries(codes)) {
-            const perUsd = Number(data.rates?.[code]);
-            if (id !== 'usd' && perUsd > 0) put(id, anchor / perUsd);
+
+          async function fetchRate(slug) {
+            const res = await fetch(`https://sp-today.com/currency/${slug}`, {
+              headers: { 'User-Agent': 'Mozilla/5.0 (compatible; RatesBot/1.0)' },
+            });
+            if (!res.ok) return null;
+            const html = await res.text();
+            const buyMatch = html.match(/شراء[\s\S]{0,80}?([\d]+(?:[.,]\d+)?)/);
+            const sellMatch = html.match(/بيع[\s\S]{0,80}?([\d]+(?:[.,]\d+)?)/);
+            if (!buyMatch || !sellMatch) return null;
+            const buy = Number(buyMatch[1].replace(',', ''));
+            const sell = Number(sellMatch[1].replace(',', ''));
+            if (!(buy > 0) || !(sell > 0)) return null;
+            return { buy, sell };
           }
+
+          for (const [id, slug] of Object.entries(SLUGS)) {
+            try {
+              const entry = await fetchRate(slug);
+              if (entry) {
+                rates[id] = entry;
+                console.log(`OK ${id}: buy=${entry.buy} sell=${entry.sell}`);
+              } else {
+                console.log(`SKIP ${id}: تعذّر قراءة السعر، سيبقى القديم`);
+              }
+            } catch (e) {
+              console.log(`ERROR ${id}: ${e.message}`);
+            }
+            // مهلة صغيرة بين الطلبات حتى لا نُثقل على الموقع
+            await new Promise((r) => setTimeout(r, 800));
+          }
+
+          if (rates.usd) rates.usdt = { ...rates.usd };
+
           file.rates = rates;
           file.updatedAt = new Date().toISOString();
           fs.writeFileSync('public/rates.json', JSON.stringify(file, null, 2) + '\n');
