@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeftRight, BarChart3, ChevronDown, Coins, Copy, RotateCcw, Send } from "lucide-react";
+import { ArrowLeftRight, BarChart3, Calculator, ChevronDown, Coins, Copy, RotateCcw, Send } from "lucide-react";
 import { OLD_PER_NEW, currencyName, type CurrencyDef } from "@/lib/converter/data";
 import { formatNumber, safeEval } from "@/lib/converter/format";
 import { t } from "@/lib/converter/i18n";
@@ -41,6 +41,7 @@ function Index() {
   const { settings, update } = useApp();
   const tr = t(settings.lang);
   const [raw, setRaw] = useState("");
+  const [numericKeyboard, setNumericKeyboard] = useState(true);
   const [inputCurrency, setInputCurrency] = useState("syp");
   const [manualMode, setManualMode] = useState<"old" | "new" | null>(null);
   const [notice, setNotice] = useState("");
