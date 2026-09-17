@@ -32,7 +32,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#087f67" },
     ],
-    links: [{ rel: "manifest", href: "/manifest.webmanifest" }],
+    links: [{ rel: "manifest", href: `${import.meta.env.BASE_URL}manifest.webmanifest` }],
   }),
   component: Index,
 });
