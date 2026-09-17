@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeftRight, BarChart3, Calculator, ChevronDown, Coins, Copy, RotateCcw, Send } from "lucide-react";
+import { ArrowLeftRight, BarChart3, ChevronDown, Coins, Copy, RotateCcw, Send } from "lucide-react";
 import { OLD_PER_NEW, currencyName, type CurrencyDef } from "@/lib/converter/data";
 import { formatNumber, safeEval } from "@/lib/converter/format";
 import { t } from "@/lib/converter/i18n";
@@ -37,11 +37,19 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+const MATH_OPS = [
+  { label: "+", value: "+" },
+  { label: "−", value: "-" },
+  { label: "×", value: "*" },
+  { label: "÷", value: "/" },
+  { label: "(", value: "(" },
+  { label: ")", value: ")" },
+];
+
 function Index() {
   const { settings, update } = useApp();
   const tr = t(settings.lang);
   const [raw, setRaw] = useState("");
-  const [numericKeyboard, setNumericKeyboard] = useState(true);
   const [inputCurrency, setInputCurrency] = useState("syp");
   const [manualMode, setManualMode] = useState<"old" | "new" | null>(null);
   const [notice, setNotice] = useState("");
@@ -93,29 +101,18 @@ function Index() {
     setTimeout(() => setNotice(""), 1800);
   }
 
-    return (
+  return (
     <Screen>
       <AppHeader />
       <StatusStrip />
 
       <section className="mt-3 rounded-xl border border-border bg-card p-3 shadow-panel sm:p-4">
-        <div className="flex items-center justify-between">
-          <label htmlFor="amount" className="text-xs font-semibold text-muted-foreground">{tr.inputCurrency}</label>
-          <button
-            type="button"
-            onClick={() => setNumericKeyboard((v) => !v)}
-            className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-semibold text-muted-foreground hover:bg-muted"
-            aria-label={tr.toggleKeyboard}
-          >
-            <Calculator className="size-3.5" />
-            {numericKeyboard ? tr.mathKeyboard : tr.numericKeyboard}
-          </button>
-        </div>
+        <label htmlFor="amount" className="text-xs font-semibold text-muted-foreground">{tr.inputCurrency}</label>
         <div className="mt-1.5 grid grid-cols-[minmax(0,1fr)_9rem] gap-2">
           <input
             id="amount"
             type="text"
-            inputMode={numericKeyboard ? "decimal" : "text"}
+            inputMode="decimal"
             autoComplete="off"
             value={raw}
             onChange={(event) => setRaw(event.target.value)}
@@ -135,6 +132,18 @@ function Index() {
             </select>
             <ChevronDown className="pointer-events-none absolute end-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           </div>
+        </div>
+        <div className="mt-1.5 grid grid-cols-6 gap-1.5">
+          {MATH_OPS.map((op) => (
+            <button
+              key={op.value}
+              type="button"
+              onClick={() => setRaw((prev) => prev + op.value)}
+              className="h-9 rounded-lg border border-input bg-muted text-base font-bold text-foreground hover:bg-accent"
+            >
+              {op.label}
+            </button>
+          ))}
         </div>
         {invalid && <p className="mt-1 text-xs font-semibold text-loss">{tr.invalid}</p>}
         {!invalid && hasAmount && isExpression && (
