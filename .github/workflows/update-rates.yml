@@ -21,8 +21,9 @@ jobs:
           node --input-type=module <<'EOF'
           import fs from 'node:fs';
 
+          // كل قيمة يمكن أن تكون مساراً واحداً أو قائمة مسارات بديلة تُجرَّب بالترتيب
           const SLUGS = {
-            usd: 'us-dollar',
+            usd: ['us-dollar', 'dollar', 'usd', 'us_dollar'],
             eur: 'euro',
             sar: 'saudi_riyal',
             aed: 'emirati_dirham',
@@ -45,14 +46,15 @@ jobs:
             const res = await fetch(url, {
               headers: { 'User-Agent': 'Mozilla/5.0 (compatible; RatesBot/1.0)' },
             });
-            if (!res.ok) return null;
+            if (!res.ok) {
+              console.log(`  (HTTP ${res.status} على ${url})`);
+              return null;
+            }
             return res.text();
           }
 
           function extractBuySell(html) {
             if (!html) return null;
-            // يسمح بفاصلة الآلاف (مثل 16,648.00) ويشترط وجود فاصلة عشرية
-            // لتفادي التقاط أرقام عشوائية من أكواد التصميم.
             const buyMatch = html.match(/شراء[\s\S]{0,300}?([\d,]+\.\d{1,4})/);
             const sellMatch = html.match(/بيع[\s\S]{0,300}?([\d,]+\.\d{1,4})/);
             if (!buyMatch || !sellMatch) return null;
@@ -62,11 +64,20 @@ jobs:
             return { buy, sell };
           }
 
-          // العملات
-          for (const [id, slug] of Object.entries(SLUGS)) {
-            try {
+          async function fetchRateWithFallback(slugs) {
+            const list = Array.isArray(slugs) ? slugs : [slugs];
+            for (const slug of list) {
               const html = await fetchHtml(`https://sp-today.com/currency/${slug}`);
               const entry = extractBuySell(html);
+              if (entry) return entry;
+              await new Promise((r) => setTimeout(r, 400));
+            }
+            return null;
+          }
+
+          for (const [id, slugs] of Object.entries(SLUGS)) {
+            try {
+              const entry = await fetchRateWithFallback(slugs);
               if (entry) {
                 rates[id] = entry;
                 console.log(`OK ${id}: buy=${entry.buy} sell=${entry.sell}`);
@@ -79,7 +90,6 @@ jobs:
             await new Promise((r) => setTimeout(r, 800));
           }
 
-          // الذهب عيار 21 (بالليرة السورية الجديدة)
           try {
             const html = await fetchHtml('https://sp-today.com/gold/21k/syp');
             const entry = extractBuySell(html);
