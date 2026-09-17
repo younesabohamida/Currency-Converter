@@ -7,7 +7,13 @@ import { defineConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 import { VitePWA } from "vite-plugin-pwa";
 
+// عند النشر على GitHub Pages كصفحة مشروع (username.github.io/اسم-المستودع/)
+// يجب أن يعرف Vite/الموجّه هذا المسار الفرعي. حدّد BASE_PATH في CI فقط؛
+// محلياً (dev/build العادي) يبقى "/" كما هو.
+const base = process.env.BASE_PATH || "/";
+
 export default defineConfig({
+  base,
   resolve: {
     dedupe: ["react", "react-dom"],
   },
@@ -16,7 +22,12 @@ export default defineConfig({
     tailwindcss(),
     tanstackRouter(),
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    tanstackStart({ server: { entry: "server" } }),
+    tanstackStart({
+      server: { entry: "server" },
+      // يولّد ملفات HTML ثابتة في .output/public يمكن نشرها مباشرة على أي
+      // استضافة ثابتة (GitHub Pages) دون الحاجة لتشغيل خادم Node.
+      prerender: { enabled: true, crawlLinks: true },
+    }),
     react(),
     nitro(),
     VitePWA({
