@@ -93,12 +93,13 @@ function Index() {
     setTimeout(() => setNotice(""), 1800);
   }
 
-  return (
+    return (
     <Screen>
       <AppHeader />
       <StatusStrip />
 
-         <div className="flex items-center justify-between">
+      <section className="mt-3 rounded-xl border border-border bg-card p-3 shadow-panel sm:p-4">
+        <div className="flex items-center justify-between">
           <label htmlFor="amount" className="text-xs font-semibold text-muted-foreground">{tr.inputCurrency}</label>
           <button
             type="button"
