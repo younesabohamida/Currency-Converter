@@ -10,6 +10,8 @@ export const getRouter = () => {
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
+    // يسمح بنشر التطبيق تحت مسار فرعي (مثل GitHub Pages: /اسم-المستودع/)
+    basepath: import.meta.env.BASE_URL,
   });
 
   return router;
