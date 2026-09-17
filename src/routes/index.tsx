@@ -98,13 +98,23 @@ function Index() {
       <AppHeader />
       <StatusStrip />
 
-      <section className="mt-3 rounded-xl border border-border bg-card p-3 shadow-panel sm:p-4">
-        <label htmlFor="amount" className="text-xs font-semibold text-muted-foreground">{tr.inputCurrency}</label>
+         <div className="flex items-center justify-between">
+          <label htmlFor="amount" className="text-xs font-semibold text-muted-foreground">{tr.inputCurrency}</label>
+          <button
+            type="button"
+            onClick={() => setNumericKeyboard((v) => !v)}
+            className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-semibold text-muted-foreground hover:bg-muted"
+            aria-label={tr.toggleKeyboard}
+          >
+            <Calculator className="size-3.5" />
+            {numericKeyboard ? tr.mathKeyboard : tr.numericKeyboard}
+          </button>
+        </div>
         <div className="mt-1.5 grid grid-cols-[minmax(0,1fr)_9rem] gap-2">
           <input
             id="amount"
             type="text"
-            inputMode="text"
+            inputMode={numericKeyboard ? "decimal" : "text"}
             autoComplete="off"
             value={raw}
             onChange={(event) => setRaw(event.target.value)}
