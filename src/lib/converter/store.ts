@@ -51,7 +51,7 @@ export function defaultSettings(): Settings {
     autoSync: true,
     syncedAt: "",
     syncSource: null,
-    pinnedCurrencies: ["usd", "gold21", "try"],
+    pinnedCurrencies: ["usd", "gold21"],
   };
 }
 
