@@ -86,7 +86,7 @@ function load(): Settings {
       rates: { ...base.rates, ...(parsed.rates ?? {}) },
       custom: parsed.custom ?? [],
       enabled: parsed.enabled?.length ? parsed.enabled : base.enabled,
-      pinnedCurrencies: parsed.pinnedCurrencies?.length === 3 ? parsed.pinnedCurrencies : base.pinnedCurrencies,
+      pinnedCurrencies: parsed.pinnedCurrencies?.length ? parsed.pinnedCurrencies : base.pinnedCurrencies,
     };
   } catch {
     return base;
