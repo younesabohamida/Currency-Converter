@@ -96,7 +96,7 @@ function PricingScreen() {
             id="cost"
             value={raw}
             onChange={(event) => setRaw(event.target.value)}
-            inputMode="text"
+            inputMode="decimal"
             placeholder="0"
             className="h-12 min-w-0 rounded-xl border border-input bg-background px-3 text-2xl font-extrabold tabular-nums outline-none focus:ring-2 focus:ring-ring"
           />
