@@ -96,25 +96,6 @@ export function SettingsPanel({ settings, update, setRate }: Props) {
             ))}
           </div>
         </div>
-        <div className="border-t border-border pt-3">
-          <Label htmlFor="targetCurrency" className="text-sm font-semibold">
-            {tr.targetCurrency}
-          </Label>
-          <p className="mt-0.5 text-xs text-muted-foreground">{tr.targetHint}</p>
-          <select
-            id="targetCurrency"
-            value={settings.targetCurrency}
-            onChange={(e) => update({ targetCurrency: e.target.value })}
-            className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3 text-sm font-semibold"
-          >
-            <option value="syp">{tr.syp}</option>
-            {visible.map((currency) => (
-              <option key={currency.id} value={currency.id}>
-                {currencyName(currency, settings.lang)} {currency.symbol}
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
 
       <h3 className="mt-5 text-lg font-bold">{tr.syncTitle}</h3>
@@ -124,16 +105,20 @@ export function SettingsPanel({ settings, update, setRate }: Props) {
           <Label className="text-base">{tr.syncToggle}</Label>
           <Switch checked={settings.autoSync} onCheckedChange={(v) => update({ autoSync: v })} />
         </div>
-        <div>
-          <Label className="text-xs text-muted-foreground">{tr.syncUrl}</Label>
-          <Input
-            className="mt-1 h-11 text-sm"
-            dir="ltr"
-            placeholder="https://raw.githubusercontent.com/user/repo/main/public/rates.json"
-            value={settings.ratesUrl}
-            onChange={(e) => update({ ratesUrl: e.target.value })}
-          />
-        </div>
+        <details className="rounded-lg border border-border p-2.5">
+          <summary className="cursor-pointer text-xs font-semibold text-primary">{tr.advancedOptions}</summary>
+          <div className="mt-2.5">
+            <Label className="text-xs text-muted-foreground">{tr.syncUrl}</Label>
+            <Input
+              className="mt-1 h-11 text-sm"
+              dir="ltr"
+              placeholder="https://raw.githubusercontent.com/user/repo/main/public/rates.json"
+              value={settings.ratesUrl}
+              onChange={(e) => update({ ratesUrl: e.target.value })}
+            />
+            <p className="mt-1.5 text-[11px] text-muted-foreground">{tr.syncUrlHint}</p>
+          </div>
+        </details>
         {settings.syncSource && (
           <p className="text-xs text-muted-foreground">
             {settings.syncSource === "github" ? tr.syncSourceGithub : tr.syncSourceFx}
