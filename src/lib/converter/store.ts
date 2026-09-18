@@ -30,6 +30,8 @@ export interface Settings {
   autoSync: boolean;
   syncedAt: string;
   syncSource: SyncSource | null;
+  /** 3 عملات إضافية مثبتة يختارها المستخدم لعرضها كمستطيلات بجانب العملة الهدف */
+  pinnedCurrencies: string[];
 }
 
 export const DEFAULT_RATES_URL = `${import.meta.env.BASE_URL}rates.json`;
@@ -37,7 +39,7 @@ export const DEFAULT_RATES_URL = `${import.meta.env.BASE_URL}rates.json`;
 export function defaultSettings(): Settings {
   return {
     version: 2,
-    lang: "en",
+    lang: "ar",
     dark: true,
     priceMode: "sell",
     targetCurrency: "eur",
@@ -49,6 +51,7 @@ export function defaultSettings(): Settings {
     autoSync: true,
     syncedAt: "",
     syncSource: null,
+    pinnedCurrencies: ["usd", "gold21", "try"],
   };
 }
 
@@ -83,6 +86,7 @@ function load(): Settings {
       rates: { ...base.rates, ...(parsed.rates ?? {}) },
       custom: parsed.custom ?? [],
       enabled: parsed.enabled?.length ? parsed.enabled : base.enabled,
+      pinnedCurrencies: parsed.pinnedCurrencies?.length === 3 ? parsed.pinnedCurrencies : base.pinnedCurrencies,
     };
   } catch {
     return base;
