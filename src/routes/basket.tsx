@@ -103,7 +103,7 @@ function BasketScreen() {
                 <input
                   value={row.raw}
                   onChange={(event) => patchRow(row.id, { raw: event.target.value })}
-                  inputMode="text"
+                  inputMode="decimal"
                   placeholder="0"
                   aria-label={tr.addAmount}
                   className="h-11 w-full rounded-xl border border-input bg-background px-3 text-lg font-extrabold tabular-nums outline-none focus:ring-2 focus:ring-ring"
