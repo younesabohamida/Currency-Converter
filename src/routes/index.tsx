@@ -234,7 +234,10 @@ function Index() {
               <CurrencyMark id={pinId} />
               <div className="min-w-0 flex-1">
                 <div className="truncate text-xs font-semibold text-muted-foreground">{pinLabel}</div>
-                <strong className="mt-0.5 block break-all text-2xl font-black leading-none tabular-nums">{isNaN(pinValue) ? "—" : formatNumber(pinValue, 2)}</strong>
+                <div className="mt-0.5 flex flex-wrap items-end gap-x-2 gap-y-1">
+                  <strong className="break-all text-2xl font-black leading-none tabular-nums">{isNaN(pinValue) ? "—" : formatNumber(pinValue, 2)}</strong>
+                  <Trend value={MOVES[pinId] ?? 0.11} />
+                </div>
               </div>
               <div className="relative shrink-0">
                 <button
