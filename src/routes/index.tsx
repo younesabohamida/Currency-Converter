@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeftRight, BarChart3, ChevronDown, Coins, Copy, RotateCcw, Send } from "lucide-react";
+import { ArrowLeftRight, BarChart3, ChevronDown, Coins, Copy, Repeat, RotateCcw, Send } from "lucide-react";
 import { OLD_PER_NEW, currencyName, type CurrencyDef } from "@/lib/converter/data";
 import { formatNumber, safeEval } from "@/lib/converter/format";
 import { t } from "@/lib/converter/i18n";
@@ -189,6 +189,24 @@ function Index() {
               <Trend value={0.32} />
             </div>
           </div>
+          <div className="relative z-10 shrink-0">
+            <button
+              type="button"
+              aria-label={tr.changeCurrency}
+              className="grid size-9 place-items-center rounded-full bg-white/15 text-hero-foreground hover:bg-white/25"
+            >
+              <Repeat className="size-4" />
+            </button>
+            <select
+              value={settings.targetCurrency}
+              onChange={(event) => update({ targetCurrency: event.target.value })}
+              aria-label={tr.changeCurrency}
+              className="absolute inset-0 cursor-pointer opacity-0"
+            >
+              <option value="syp">{tr.syp}</option>
+              {currencies.map((currency) => <option key={currency.id} value={currency.id}>{currencyName(currency, settings.lang)}</option>)}
+            </select>
+          </div>
         </div>
 
         {settings.targetCurrency === "syp" && (
@@ -203,6 +221,46 @@ function Index() {
             </div>
           </div>
         )}
+
+        {settings.pinnedCurrencies.map((pinId, idx) => {
+          const pinLabel = pinId === "syp"
+            ? tr.syp
+            : currencyName(currencies.find((c) => c.id === pinId) ?? { id: pinId, nameAr: pinId, nameDe: pinId, symbol: "" }, settings.lang);
+          const pinRate = pinId === "syp" ? 1 : rateOf(settings, pinId);
+          const pinValue = pinId === "syp" ? newAmount : (pinRate > 0 ? newAmount / pinRate : NaN);
+          const accentClass = idx === 0 ? "border-s-primary" : idx === 1 ? "border-s-accent" : "border-s-secondary";
+          return (
+            <div key={idx} className={`flex min-h-20 items-center gap-3 rounded-xl border border-border border-s-4 bg-card p-3.5 shadow-panel ${accentClass}`}>
+              <CurrencyMark id={pinId} />
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-xs font-semibold text-muted-foreground">{pinLabel}</div>
+                <strong className="mt-0.5 block break-all text-2xl font-black leading-none tabular-nums">{isNaN(pinValue) ? "—" : formatNumber(pinValue, 2)}</strong>
+              </div>
+              <div className="relative shrink-0">
+                <button
+                  type="button"
+                  aria-label={tr.changeCurrency}
+                  className="grid size-8 place-items-center rounded-full bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                >
+                  <Repeat className="size-4" />
+                </button>
+                <select
+                  value={pinId}
+                  onChange={(event) => {
+                    const next = [...settings.pinnedCurrencies];
+                    next[idx] = event.target.value;
+                    update({ pinnedCurrencies: next });
+                  }}
+                  aria-label={tr.changeCurrency}
+                  className="absolute inset-0 cursor-pointer opacity-0"
+                >
+                  <option value="syp">{tr.syp}</option>
+                  {currencies.map((currency) => <option key={currency.id} value={currency.id}>{currencyName(currency, settings.lang)}</option>)}
+                </select>
+              </div>
+            </div>
+          );
+        })}
       </section>
 
       <section className="mt-3 overflow-hidden rounded-xl border border-border bg-card shadow-panel">
