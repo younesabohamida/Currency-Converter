@@ -1,5 +1,6 @@
 export function safeEval(expr: string): number {
-  const cleaned = expr.replace(/[^0-9+\-*/().\s]/g, "");
+  const normalized = expr.replace(/,/g, ".");
+  const cleaned = normalized.replace(/[^0-9+\-*/().\s]/g, "");
   if (!cleaned.trim()) return NaN;
   try {
     // eslint-disable-next-line no-new-func
